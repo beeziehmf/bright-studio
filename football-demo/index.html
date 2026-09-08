@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Eleven — Football Mobile Simulator</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent} body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0c0e12;color:#f7f8fa;overflow-x:hidden}
+  button,input{font:inherit}button{touch-action:manipulation;cursor:pointer}.app{max-width:460px;margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#121720 0%,#0d1016 100%);position:relative;padding-bottom:88px}
+  .topbar{position:sticky;top:0;z-index:20;padding:14px 16px;background:rgba(10,13,18,.9);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
+  .brand{font-weight:900;letter-spacing:.08em}.chip{font-size:12px;background:#1b2330;border:1px solid #293346;padding:7px 10px;border-radius:999px;color:#d8e3f0}
+  .screen{display:none;padding:16px}.screen.active{display:block}.hero{padding:18px;border-radius:22px;background:radial-gradient(circle at 80% 20%,rgba(103,255,148,.16),transparent 34%),linear-gradient(145deg,#18231e,#12171c);border:1px solid rgba(130,255,171,.15);margin-bottom:14px}
+  h1,h2,h3,p{margin:0}.hero h1{font-size:30px;line-height:1.0;margin:8px 0 10px}.muted{color:#9aa5b1;font-size:13px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:#85f2a8;font-weight:800}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:#151a22;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:14px}.stat{font-size:24px;font-weight:900;margin-top:5px}.section-title{display:flex;justify-content:space-between;align-items:center;margin:18px 0 10px}.section-title h2{font-size:17px}.pill{border:none;border-radius:999px;padding:8px 11px;background:#232b38;color:#fff;font-size:12px}
+  .player{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:16px;background:#151a22;border:1px solid rgba(255,255,255,.06);margin-bottom:8px}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#25314a,#121722);font-weight:900;color:#dbe6ff}.pinfo{flex:1}.pname{font-weight:800}.meta{font-size:11px;color:#8f99a6;margin-top:3px}.rating{font-size:19px;font-weight:900;color:#91ffb1}
+  .primary{width:100%;border:0;border-radius:15px;padding:14px 16px;background:#78f09d;color:#08120b;font-weight:900}.secondary{width:100%;border-radius:15px;padding:13px 16px;background:#202633;color:#fff;border:1px solid #303849;font-weight:800}.row{display:flex;gap:9px}.row>*{flex:1}
+  .pitch{height:510px;border-radius:24px;background:repeating-linear-gradient(0deg,#1f783c 0,#1f783c 45px,#257f43 45px,#257f43 90px);position:relative;overflow:hidden;border:2px solid rgba(255,255,255,.18);box-shadow:inset 0 0 0 5px rgba(255,255,255,.03)}
+  .pitch:before{content:"";position:absolute;inset:18px;border:2px solid rgba(255,255,255,.45);border-radius:2px}.half{position:absolute;left:18px;right:18px;top:50%;height:2px;background:rgba(255,255,255,.45)}.circle{position:absolute;left:50%;top:50%;width:92px;height:92px;border:2px solid rgba(255,255,255,.45);border-radius:50%;transform:translate(-50%,-50%)}
+  .dot{position:absolute;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:900;transform:translate(-50%,-50%);transition:.12s linear}.me{background:#fbfbfb;color:#111;border:2px solid #111}.cpu{background:#ff5f63;color:#fff;border:2px solid #581b1e}.ball{width:16px;height:16px;background:#fff;border:2px solid #111;z-index:4}.score{display:flex;justify-content:center;gap:14px;align-items:center;margin:0 0 10px}.score b{font-size:25px}.timer{font-size:12px;color:#a8b0ba}.controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px}.joystick{width:118px;height:118px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);position:relative;touch-action:none}.knob{width:54px;height:54px;border-radius:50%;background:#dfe6ed;position:absolute;left:32px;top:32px;box-shadow:0 5px 20px rgba(0,0,0,.3)}.actions{display:grid;grid-template-columns:58px 58px;gap:10px;align-items:center}.action{height:58px;border-radius:50%;border:none;font-size:11px;font-weight:900}.shoot{background:#ffbe45;color:#1c1200}.pass{background:#70dfff;color:#00161c}.sprint{background:#fb6f91;color:#24000b}.switch{background:#d4b6ff;color:#1d0c2d}
+  .lineup{height:485px;border-radius:22px;background:linear-gradient(#176b34,#1f7b3f);position:relative;border:1px solid rgba(255,255,255,.1);overflow:hidden}.slot{position:absolute;transform:translate(-50%,-50%);text-align:center}.slot .mini{width:48px;height:48px;border-radius:50%;background:#0f1217;border:2px solid #8df2a9;display:grid;place-items:center;font-size:11px;font-weight:900}.slot span{display:block;font-size:10px;font-weight:700;margin-top:3px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .market .player button{border:0;border-radius:10px;background:#2a3442;color:#fff;padding:8px 9px;font-size:11px;font-weight:800}.owned{opacity:.45}
+  .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(460px,100%);height:76px;background:rgba(12,14,18,.95);backdrop-filter:blur(18px);border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(5,1fr);z-index:30}.nav button{border:0;background:transparent;color:#7f8994;font-size:10px;font-weight:700}.nav button.active{color:#8df2a9}.icon{display:block;font-size:21px;margin-bottom:3px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center;z-index:50}.modal.show{display:flex}.sheet{width:min(460px,100%);background:#171c24;border-radius:24px 24px 0 0;padding:18px}.input{width:100%;background:#0e1218;border:1px solid #2d3643;color:#fff;border-radius:13px;padding:13px;margin:8px 0 12px}.notice{font-size:11px;color:#9ea6af;line-height:1.45;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar"><div><div class="brand">ELEVEN</div><div id="jsStatus" style="font-size:9px;color:#85f2a8;margin-top:2px">● JEU ACTIF</div></div><div class="chip" id="coins">€500.0M</div></div>
+
+  <section id="home" class="screen active">
+    <div class="hero"><div class="eyebrow">Club HQ</div><h1 id="clubTitle">Grandduc FC</h1><p class="muted">Construis ton équipe, règle ta tactique et joue les matchs directement sur mobile.</p></div>
+    <div class="grid"><div class="card"><div class="muted">Note équipe</div><div class="stat" id="teamOVR">91</div></div><div class="card"><div class="muted">Valeur effectif</div><div class="stat">€1.1B</div></div><div class="card"><div class="muted">Fans</div><div class="stat">2.4M</div></div><div class="card"><div class="muted">Forme</div><div class="stat">W W D</div></div></div>
+    <div class="section-title"><h2>Prochain match</h2><span class="pill">Ligue</span></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>Grandduc FC</b><div class="meta">Domicile</div></div><div style="font-weight:900">VS</div><div style="text-align:right"><b>Madrid Stars</b><div class="meta">CPU 92</div></div></div><div style="height:12px"></div><button class="primary" onclick="go('match')">Jouer le match</button></div>
+    <div class="section-title"><h2>Stars de l’équipe</h2><button class="pill" onclick="go('squad')">Voir tout</button></div>
+    <div id="homePlayers"></div>
+  </section>
+
+  <section id="squad" class="screen">
+    <div class="section-title"><h2>Mon équipe</h2><button class="pill" onclick="openClub()">Modifier club</button></div>
+    <div class="lineup" id="lineup"></div>
+    <div class="section-title"><h2>Effectif</h2><span class="pill" id="countPlayers">11 joueurs</span></div>
+    <div id="squadPlayers"></div>
+  </section>
+
+  <section id="market" class="screen market">
+    <div class="hero"><div class="eyebrow">Marché des transferts</div><h1>Recrute des stars</h1><p class="muted">Achète des joueurs et fais évoluer ton onze. Budget partagé avec ton club.</p></div>
+    <div id="marketPlayers"></div>
+  </section>
+
+  <section id="match" class="screen">
+    <div class="score"><div><b id="myScore">0</b><div class="meta">GFC</div></div><div style="text-align:center"><div class="timer" id="timer">00:00</div><strong>—</strong></div><div><b id="cpuScore">0</b><div class="meta">MAD</div></div></div>
+    <div class="pitch" id="pitch"><div class="half"></div><div class="circle"></div><div class="dot me" id="me" style="left:50%;top:73%">10</div><div class="dot cpu" id="cpu" style="left:50%;top:27%">9</div><div class="dot ball" id="ball" style="left:50%;top:60%"></div></div>
+    <div class="controls"><div class="joystick" id="joystick"><div class="knob" id="knob"></div></div><div class="actions"><button class="action shoot" onclick="shoot()">TIR</button><button class="action pass" onclick="passBall()">PASSE</button><button class="action sprint" id="sprintBtn">SPRINT</button><button class="action switch" onclick="resetPlayer()">RESET</button></div></div>
+    <div style="height:12px"></div><button class="secondary" onclick="restartMatch()">Recommencer le match</button>
+    <p class="notice">Prototype jouable : joystick tactile, tir, passe, sprint, adversaire simple piloté par IA locale.</p>
+  </section>
+
+  <section id="profile" class="screen">
+    <div class="hero"><div class="eyebrow">Manager</div><h1>Ton club, tes règles.</h1><p class="muted">Version prototype : identité du club, progression, transferts et matchs tactiles.</p></div>
+    <button class="primary" onclick="openClub()">Personnaliser mon club</button><div style="height:10px"></div><button class="secondary" onclick="resetDemo()">Réinitialiser la démo</button>
+    <div class="section-title"><h2>Roadmap</h2></div>
+    <div class="card"><b>À ajouter ensuite</b><p class="notice">Carrière complète, divisions, contrats, blessures, fatigue, tactiques, entraînement, scouting, saisons, classement en ligne, sauvegarde cloud et moteur de match plus avancé.</p></div>
+  </section>
+
+  <nav class="nav">
+    <button class="active" data-screen="home" onclick="go('home',this)"><span class="icon">⌂</span>Accueil</button>
+    <button data-screen="squad" onclick="go('squad',this)"><span class="icon">♟</span>Équipe</button>
+    <button data-screen="market" onclick="go('market',this)"><span class="icon">↗</span>Marché</button>
+    <button data-screen="match" onclick="go('match',this)"><span class="icon">⚽</span>Match</button>
+    <button data-screen="profile" onclick="go('profile',this)"><span class="icon">☰</span>Club</button>
+  </nav>
+</div>
+
+<div class="modal" id="clubModal"><div class="sheet"><h2>Créer mon club</h2><input id="clubName" class="input" value="Grandduc FC" placeholder="Nom du club"/><button class="primary" onclick="saveClub()">Enregistrer</button><p class="notice">Le nom est sauvegardé localement sur ton appareil.</p></div></div>
+
+<script>
+const initial=[
+ {name:'Kylian Mbappé',pos:'ST',ovr:94,price:180,owned:true},{name:'Erling Haaland',pos:'ST',ovr:93,price:175,owned:true},{name:'Jude Bellingham',pos:'CM',ovr:92,price:165,owned:true},{name:'Vinícius Júnior',pos:'LW',ovr:93,price:170,owned:true},{name:'Lamine Yamal',pos:'RW',ovr:92,price:160,owned:true},{name:'Rodri',pos:'CDM',ovr:91,price:110,owned:true},{name:'William Saliba',pos:'CB',ovr:90,price:95,owned:true},{name:'Virgil van Dijk',pos:'CB',ovr:90,price:50,owned:true},{name:'Achraf Hakimi',pos:'RB',ovr:90,price:80,owned:true},{name:'Theo Hernández',pos:'LB',ovr:89,price:70,owned:true},{name:'Gianluigi Donnarumma',pos:'GK',ovr:89,price:45,owned:true},
+ {name:'Pedri',pos:'CM',ovr:90,price:120},{name:'Bukayo Saka',pos:'RW',ovr:91,price:145},{name:'Florian Wirtz',pos:'CAM',ovr:91,price:140},{name:'Jamal Musiala',pos:'CAM',ovr:91,price:150},{name:'Rúben Dias',pos:'CB',ovr:89,price:75},{name:'Alisson Becker',pos:'GK',ovr:89,price:40}
+];
+const memoryStore={};
+function safeGet(key,fallback){try{const v=window.localStorage.getItem(key);return v===null?fallback:v}catch(e){return Object.prototype.hasOwnProperty.call(memoryStore,key)?memoryStore[key]:fallback}}
+function safeSet(key,value){try{window.localStorage.setItem(key,String(value))}catch(e){memoryStore[key]=String(value)}}
+let savedPlayers=safeGet('eleven_players',null);
+let players;try{players=savedPlayers?JSON.parse(savedPlayers):initial.map(p=>({...p}))}catch(e){players=initial.map(p=>({...p}))}
+let budget=Number(safeGet('eleven_budget',500));if(!Number.isFinite(budget))budget=500;
+let club=safeGet('eleven_club','Grandduc FC');
+function initials(n){return n.split(' ').map(x=>x[0]).slice(0,2).join('')}
+function render(){document.getElementById('clubTitle').textContent=club;document.getElementById('clubName').value=club;document.getElementById('coins').textContent=`€${budget.toFixed(1)}M`;let owned=players.filter(p=>p.owned);document.getElementById('countPlayers').textContent=`${owned.length} joueurs`;let ovr=Math.round(owned.reduce((a,p)=>a+p.ovr,0)/owned.length);document.getElementById('teamOVR').textContent=isFinite(ovr)?ovr:'—';document.getElementById('homePlayers').innerHTML=owned.slice(0,3).map(playerRow).join('');document.getElementById('squadPlayers').innerHTML=owned.map(playerRow).join('');document.getElementById('marketPlayers').innerHTML=players.filter(p=>!p.owned).map(p=>`<div class="player"><div class="avatar">${initials(p.name)}</div><div class="pinfo"><div class="pname">${p.name}</div><div class="meta">${p.pos} • €${p.price}M</div></div><div class="rating">${p.ovr}</div><button onclick="buy('${p.name.replace(/'/g,"\\'")}')">Signer</button></div>`).join('')||'<div class="card"><b>Marché vide</b><p class="notice">Tu as signé tous les joueurs disponibles dans ce prototype.</p></div>';renderLineup(owned);}
+function playerRow(p){return `<div class="player"><div class="avatar">${initials(p.name)}</div><div class="pinfo"><div class="pname">${p.name}</div><div class="meta">${p.pos} • International</div></div><div class="rating">${p.ovr}</div></div>`}
+function renderLineup(o){let selected=o.slice(0,11), spots=[[50,90],[23,75],[77,75],[50,70],[18,55],[50,53],[82,55],[20,34],[50,31],[80,34],[50,12]];document.getElementById('lineup').innerHTML=selected.map((p,i)=>`<div class="slot" style="left:${spots[i][0]}%;top:${spots[i][1]}%"><div class="mini">${p.ovr}</div><span>${p.name}</span></div>`).join('')}
+function buy(name){let p=players.find(x=>x.name===name);if(!p)return;if(budget<p.price){alert('Budget insuffisant.');return;}budget-=p.price;p.owned=true;safeSet('eleven_budget',budget);safeSet('eleven_players',JSON.stringify(players));render()}
+function go(id,btn){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.screen===id));if(id==='match') startTimer();}
+function resetDemo(){players=initial.map(p=>({...p}));budget=500;club='Grandduc FC';safeSet('eleven_players',JSON.stringify(players));safeSet('eleven_budget',budget);safeSet('eleven_club',club);restartMatch();render();go('home')}
+function openClub(){document.getElementById('clubModal').classList.add('show')}function saveClub(){club=document.getElementById('clubName').value.trim()||'Grandduc FC';safeSet('eleven_club',club);document.getElementById('clubModal').classList.remove('show');render()}
+document.getElementById('clubModal').onclick=e=>{if(e.target.id==='clubModal')e.currentTarget.classList.remove('show')}
+
+let mx=50,my=73,bx=50,by=60,cx=50,cy=27,sprinting=false,time=0,timerInt=null;
+const me=document.getElementById('me'),ball=document.getElementById('ball'),cpu=document.getElementById('cpu');
+function sync(){mx=Math.max(5,Math.min(95,mx));my=Math.max(5,Math.min(95,my));bx=Math.max(4,Math.min(96,bx));by=Math.max(4,Math.min(96,by));me.style.left=mx+'%';me.style.top=my+'%';ball.style.left=bx+'%';ball.style.top=by+'%';cpu.style.left=cx+'%';cpu.style.top=cy+'%'}
+function dist(a,b,c,d){return Math.hypot(a-c,b-d)}
+function move(dx,dy){let sp=sprinting?2.2:1.25;mx+=dx*sp;my+=dy*sp;if(dist(mx,my,bx,by)<8){bx=mx;by=my-5;}sync()}
+const joy=document.getElementById('joystick'),knob=document.getElementById('knob');let joyActive=false;
+function joyMove(e){if(!joyActive)return;let t=e.touches?e.touches[0]:e,r=joy.getBoundingClientRect(),dx=t.clientX-(r.left+r.width/2),dy=t.clientY-(r.top+r.height/2),m=Math.hypot(dx,dy),lim=40;if(m>lim){dx=dx/m*lim;dy=dy/m*lim}knob.style.transform=`translate(${dx}px,${dy}px)`;move(dx/40,dy/40)}
+joy.addEventListener('touchstart',e=>{e.preventDefault();joyActive=true;joyMove(e)},{passive:false});joy.addEventListener('touchmove',e=>{e.preventDefault();joyMove(e)},{passive:false});joy.addEventListener('touchend',()=>{joyActive=false;knob.style.transform='translate(0,0)'});joy.addEventListener('mousedown',e=>{joyActive=true;joyMove(e)});window.addEventListener('mousemove',joyMove);window.addEventListener('mouseup',()=>{joyActive=false;knob.style.transform='translate(0,0)'});
+document.getElementById('sprintBtn').addEventListener('pointerdown',()=>sprinting=true);document.getElementById('sprintBtn').addEventListener('pointerup',()=>sprinting=false);document.getElementById('sprintBtn').addEventListener('pointercancel',()=>sprinting=false);document.getElementById('sprintBtn').addEventListener('pointerleave',()=>sprinting=false);
+function shoot(){if(dist(mx,my,bx,by)>12)return;bx=50+(Math.random()*20-10);by=1;sync();setTimeout(()=>{if(Math.abs(bx-50)<12){document.getElementById('myScore').textContent=Number(document.getElementById('myScore').textContent)+1}resetBall()},380)}
+function passBall(){if(dist(mx,my,bx,by)>12)return;bx=mx;by=Math.max(8,my-18);sync()}
+function resetBall(){bx=50;by=60;sync()}function resetPlayer(){mx=50;my=73;resetBall()}
+function cpuTick(){let dx=bx-cx,dy=by-cy,d=Math.hypot(dx,dy)||1;cx+=dx/d*.35;cy+=dy/d*.35;if(dist(cx,cy,bx,by)<5){bx=cx;by=cy+4;if(cy>92){document.getElementById('cpuScore').textContent=Number(document.getElementById('cpuScore').textContent)+1;cx=50;cy=27;resetBall()}}sync()}
+setInterval(cpuTick,80);
+function startTimer(){if(timerInt)return;timerInt=setInterval(()=>{time++;let m=Math.floor(time/60),s=time%60;document.getElementById('timer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`},1000)}
+function restartMatch(){time=0;document.getElementById('myScore').textContent=0;document.getElementById('cpuScore').textContent=0;document.getElementById('timer').textContent='00:00';mx=50;my=73;cx=50;cy=27;resetBall();sync()}
+render();sync();
+</script>
+</body>
+</html>
